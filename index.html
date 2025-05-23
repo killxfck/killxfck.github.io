@@ -28,8 +28,8 @@
       animation: wobble 1.5s cubic-bezier(0.03, 0.98, 0.52, 0.99);
     }
     @keyframes wobble {
-      0% { transform: perspective(1000px) rotateX(10deg) rotateY(10deg) scale3d(0.9, 0.9, 0.9); }
-      100% { transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1); }
+      0% { transform: rotateX(10deg) rotateY(10deg) scale3d(0.9, 0.9, 0.9); }
+      100% { transform: rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1); }
     }
     html {
       scroll-behavior: smooth;
@@ -46,16 +46,33 @@
     #bio.visible {
       display: block;
     }
+    .bio-wrapper {
+      position: relative;
+    }
     .bio-container {
       perspective: 1000px;
       transition: box-shadow 0.3s ease;
-      border-radius: 0.75rem;
       position: relative;
-      background: linear-gradient(45deg, #1a1a1a, #000000); /* Изменён фон для контраста */
+      background: linear-gradient(45deg, #1a1a1a, #000000);
       overflow: hidden;
+      border-radius: 0.75rem; /* Добавляем круглые углы для карточки */
     }
     .bio-container:hover {
       box-shadow: 0 0 40px rgba(255, 0, 0, 0.7);
+    }
+    .bio-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('assets/rama.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      z-index: 1; /* Над задним фоном и баннером, но под остальным контентом */
+      border-radius: 0.75rem; /* Сглаживание углов, как у карточки */
+      transform: scale3d(1, 1, 1); /* Устанавливаем конечное состояние сразу */
     }
     .explosion {
       position: absolute;
@@ -179,19 +196,19 @@
       }
     }
     .haunted-views {
-      background: linear-gradient(45deg, #ff0000, #000000);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+      color: white; /* Белый цвет текста */
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Чёрное свечение */
       animation: pulseText 1.5s infinite;
       font-size: 1rem;
       padding: 2px 6px;
       border-radius: 4px;
+      position: relative; /* Для управления z-index */
+      z-index: 2; /* Выше рамки */
     }
     @keyframes pulseText {
-      0% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(0, 0, 0, 0.5); }
-      50% { text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 15px rgba(0, 0, 0, 0.7); }
-      100% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(0, 0, 0, 0.5); }
+      0% { text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); }
+      50% { text-shadow: 0 0 10px rgba(0, 0, 0, 1); }
+      100% { text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); }
     }
     @keyframes blood-drip {
       0% {
@@ -256,7 +273,7 @@
       pointer-events: none;
     }
     #viewCount {
-      color: red;
+      color: white; /* Белый цвет для числа просмотров */
     }
     .chainsaw-container {
       display: inline-block;
@@ -303,6 +320,10 @@
     .osint-box:hover {
       transform: scale(1.2);
     }
+    #bannerImage {
+      position: relative; /* Для управления z-index */
+      z-index: 0; /* Равен z-index рамки, чтобы рамка могла быть над баннером */
+    }
     #trackCoverImage {
       transition: transform 0.3s ease;
     }
@@ -340,7 +361,6 @@
       filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
     }
 
-    /* Новый стиль с GIF-изображением дыма */
     .bio-container::before {
       content: '';
       position: absolute;
@@ -351,7 +371,7 @@
       background: url('https://i.pinimg.com/originals/1e/f7/cb/1ef7cb22a6c0a543d8e05ef0e254509c.gif') no-repeat center;
       background-size: cover;
       opacity: 0.6;
-      z-index: -1;
+      z-index: -1; /* Под рамкой */
       animation: smokeFade 10s infinite ease-in-out;
     }
 
@@ -360,8 +380,6 @@
       50% { opacity: 0.7; }
       100% { opacity: 0.5; }
     }
-
-    /* Удаляем старый слой ::after, так как GIF уже содержит анимацию */
   </style>
 </head>
 <body class="bg-black text-white font-sans">
@@ -382,111 +400,115 @@
 
     <div id="bio" class="hidden">
       <main class="relative min-h-[125vh] flex items-center justify-center p-4" style="font-family: 'Raleway', sans-serif;">
-        <div class="bg-black bg-opacity-80 rounded-xl max-w-lg w-full page-enter bio-container">
-          <div class="relative">
-            <img id="bannerImage" src="https://c.tenor.com/LatfQjNOJQsAAAAC/tenor.gif" alt="Баннер" class="w-full h-48 object-cover rounded-t-xl">
-            <div class="absolute top-2 right-2 flex items-center space-x-2">
-              <div class="group relative">
-                <span class="haunted-views flex items-center space-x-1">
-                  <span>👁</span>
-                  <span id="viewCount">3848</span>
-                </span>
-                <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Просмотры</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-8">
-            <div class="relative flex items-center space-x-4 -mt-24 z-50">
-              <div class="avatar-wrapper">
-                <img id="avatarImage" src="https://64.media.tumblr.com/d1bd6a203eb2ccde0af242a08c0183e8/0457c88dcfe451c6-a5/s2048x3072/498e0c891b5f7c150cd97ac83ba71cefb8f27b67.jpg" alt="Аватар" loading="eager">
-                <div class="avatar-frame"></div>
-              </div>
-              <div>
-                <div class="flex items-center">
-                  <h1 class="blood-drip-text">broulyy</h1>
-                  <div class="chainsaw-container group relative">
-                    <img src="https://media.tenor.com/OqqdRvSNld4AAAAi/blood-chainsaw.gif" alt="Бензопила">
-                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Hunter</div>
-                  </div>
-                </div>
-                <div class="flex space-x-2 mt-1">
+        <div class="bio-wrapper max-w-lg w-full">
+          <div class="bio-container">
+            <div class="bg-black bg-opacity-80 page-enter">
+              <div class="relative">
+                <img id="bannerImage" src="https://c.tenor.com/LatfQjNOJQsAAAAC/tenor.gif" alt="Баннер" class="w-full h-48 object-cover">
+                <div class="absolute top-2 right-2 flex items-center space-x-2">
                   <div class="group relative">
-                    <svg class="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 0l3 9h9l-7 5.5 3 9-7-5.5-7 5.5 3-9-7-5.5h9z"/>
-                    </svg>
-                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Hunted</div>
-                  </div>
-                  <div class="group relative">
-                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
-                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Osint</div>
+                    <span class="haunted-views flex items-center space-x-1">
+                      <span>👁</span>
+                      <span id="viewCount">3848</span>
+                    </span>
+                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Просмотры</div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="flex items-center space-x-2 mt-4 text-sm">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
-              </svg>
-              <p>Russia, ??</p>
-            </div>
-            <div class="flex items-center space-x-2 mt-2 text-sm">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-              </svg>
-              <p>В OSINT: <span id="osintDays">0</span> дней</p>
-            </div>
-
-            <div class="flex flex-wrap gap-4 mt-6 items-center">
-              <a href="https://t.me/SEMETARYGRAVEMN" target="_blank" class="group relative">
-                <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>
-                </svg>
-                <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Telegram</div>
-              </a>
-              <a href="https://vk.com/id1037229571" target="_blank" class="group relative">
-                <img src="assets/vk.png" class="w-8 h-8" alt="VK">
-                <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">VK</div>
-              </a>
-              <a href="https://discord.com/users/1133667651961495572" target="_blank" class="group relative">
-                <img src="assets/discord.png" class="w-8 h-8" alt="Discord">
-                <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">@broulyy</div>
-              </a>
-              <div class="osint-box">
-                #Osint
-              </div>
-            </div>
-
-            <div class="mt-6 p-4 gradient-player rounded-lg flex items-center space-x-4">
-              <img id="trackCoverImage" src="https://i1.sndcdn.com/artworks-WaBbg3yEEpt5KTyY-yDc1yw-t200x200.jpg" alt="Обложка трека" class="w-16 h-16 rounded">
-              <div class="rhap_container rhap_loop--on w-full">
-                <audio id="audioPlayer" src="assets/pesnia.mp3" loop preload="auto"></audio>
-                <div class="rhap_header">
-                  <div class="track-title line-clamp-1 break-all">SEMATARY - WENDINGO</div>
-                </div>
-                <div class="rhap_main rhap_stacked">
-                  <div class="rhap_progress-section">
-                    <div id="rhap_current-time" class="rhap_time"></div>
-                    <input type="range" id="progress" min="0" max="100" value="0" step="1">
+              <div class="bio-frame"></div> <!-- Рамка над баннером и задним фоном, но под остальным контентом -->
+              <div class="p-8" style="z-index: 2;"> <!-- Устанавливаем z-index выше рамки -->
+                <div class="relative flex items-center space-x-4 -mt-24 z-50">
+                  <div class="avatar-wrapper">
+                    <img id="avatarImage" src="https://64.media.tumblr.com/d1bd6a203eb2ccde0af242a08c0183e8/0457c88dcfe451c6-a5/s2048x3072/498e0c891b5f7c150cd97ac83ba71cefb8f27b67.jpg" alt="Аватар" loading="eager">
+                    <div class="avatar-frame"></div>
                   </div>
-                  <div class="rhap_controls-section">
-                    <div class="rhap_additional-controls"></div>
-                    <div class="controls-right">
-                      <button id="playButton" aria-label="Play" class="custom-play-pause-button rhap_play-pause-button" type="button">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="size-5 fill-theme drop-shadow-theme">
-                          <path d="M21.4 9.4a3 3 0 0 1 0 5.2l-12.8 7C6.6 22.7 4 21.3 4 19V5c0-2.3 2.5-3.7 4.6-2.6z"></path>
+                  <div>
+                    <div class="flex items-center">
+                      <h1 class="blood-drip-text">broulyy</h1>
+                      <div class="chainsaw-container group relative">
+                        <img src="https://media.tenor.com/OqqdRvSNld4AAAAi/blood-chainsaw.gif" alt="Бензопила">
+                        <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Hunter</div>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2 mt-1">
+                      <div class="group relative">
+                        <svg class="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 0l3 9h9l-7 5.5 3 9-7-5.5-7 5.5 3-9-7-5.5h9z"/>
                         </svg>
-                      </button>
-                      <button id="pauseButton" aria-label="Pause" class="custom-play-pause-button rhap_play-pause-button" type="button" style="display: none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="size-5 fill-theme drop-shadow-theme">
-                          <rect x="6" y="4" width="5" height="16" rx="2" ry="2"/>
-                          <rect x="13" y="4" width="5" height="16" rx="2" ry="2"/>
+                        <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Hunted</div>
+                      </div>
+                      <div class="group relative">
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                         </svg>
-                      </button>
-                      <div id="current-time-display" class="rhap_time"></div>
+                        <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Osint</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-2 mt-4 text-sm">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                  </svg>
+                  <p>Russia, ??</p>
+                </div>
+                <div class="flex items-center space-x-2 mt-2 text-sm">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                  </svg>
+                  <p>В OSINT: <span id="osintDays">194</span> дней</p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mt-6 items-center">
+                  <a href="https://t.me/HuntFace" target="_blank" class="group relative">
+                    <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>
+                    </svg>
+                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">Telegram</div>
+                  </a>
+                  <a href="https://vk.com/id1037229571" target="_blank" class="group relative">
+                    <img src="assets/vk.png" class="w-8 h-8" alt="VK">
+                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">VK</div>
+                  </a>
+                  <a href="https://discord.com/users/1133667651961495572" target="_blank" class="group relative">
+                    <img src="assets/discord.png" class="w-8 h-8" alt="Discord">
+                    <div class="absolute -top-8 bg-black text-white text-xs p-2 rounded opacity-0 group-hover:opacity-100 transition">@broulyy</div>
+                  </a>
+                  <div class="osint-box">
+                    #Osint
+                  </div>
+                </div>
+
+                <div class="mt-6 p-4 gradient-player rounded-lg flex items-center space-x-4">
+                  <img id="trackCoverImage" src="https://i1.sndcdn.com/artworks-WaBbg3yEEpt5KTyY-yDc1yw-t200x200.jpg" alt="Обложка трека" class="w-16 h-16 rounded">
+                  <div class="rhap_container rhap_loop--on w-full">
+                    <audio id="audioPlayer" src="assets/pesnia.mp3" loop preload="auto"></audio>
+                    <div class="rhap_header">
+                      <div class="track-title line-clamp-1 break-all">SEMATARY - WENDINGO</div>
+                    </div>
+                    <div class="rhap_main rhap_stacked">
+                      <div class="rhap_progress-section">
+                        <div id="rhap_current-time" class="rhap_time"></div>
+                        <input type="range" id="progress" min="0" max="100" value="0" step="1">
+                      </div>
+                      <div class="rhap_controls-section">
+                        <div class="rhap_additional-controls"></div>
+                        <div class="controls-right">
+                          <button id="playButton" aria-label="Play" class="custom-play-pause-button rhap_play-pause-button" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="size-5 fill-theme drop-shadow-theme">
+                              <path d="M21.4 9.4a3 3 0 0 1 0 5.2l-12.8 7C6.6 22.7 4 21.3 4 19V5c0-2.3 2.5-3.7 4.6-2.6z"></path>
+                            </svg>
+                          </button>
+                          <button id="pauseButton" aria-label="Pause" class="custom-play-pause-button rhap_play-pause-button" type="button" style="display: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="size-5 fill-theme drop-shadow-theme">
+                              <rect x="6" y="4" width="5" height="16" rx="2" ry="2"/>
+                              <rect x="13" y="4" width="5" height="16" rx="2" ry="2"/>
+                            </svg>
+                          </button>
+                          <div id="current-time-display" class="rhap_time"></div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -508,6 +530,20 @@
       }, 20);
     }
 
+    function rotateBio(event) {
+      const bioContainer = document.querySelector('.bio-container');
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const mouseX = event.clientX - centerX;
+      const mouseY = event.clientY - centerY;
+
+      const rotateY = (mouseX / window.innerWidth) * 10;
+      const rotateX = -(mouseY / window.innerHeight) * 10;
+
+      const transformStyle = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      bioContainer.style.transform = transformStyle;
+    }
+
     function startBio() {
       const startButton = document.getElementById('startButton');
       const bio = document.getElementById('bio');
@@ -516,22 +552,24 @@
       const pauseButton = document.getElementById('pauseButton');
       const bioContainer = bio.querySelector('.bio-container');
 
-      // Сразу скрываем кнопку start
       startButton.style.display = 'none';
-
-      // Показываем био-карточку
       bio.classList.remove('hidden');
       bio.classList.add('visible');
 
-      // Добавляем взрыв
+      // Инициализируем движение карточки сразу после нажатия кнопки
+      const initialMouseEvent = new MouseEvent('mousemove', {
+        clientX: window.innerWidth / 2,
+        clientY: window.innerHeight / 2
+      });
+      rotateBio(initialMouseEvent);
+
       const explosionImg = document.createElement('img');
       explosionImg.src = 'https://theblueprint.ru/upload/5242/8cc7d113c70f5a3a1feedaed1eb60c14.gif';
       explosionImg.alt = 'Explosion';
       explosionImg.className = 'explosion';
       bioContainer.appendChild(explosionImg);
 
-      // Запускаем музыку
-      if (audioPlayer.readyState >= 2) { // Проверяем, готов ли аудио
+      if (audioPlayer.readyState >= 2) {
         audioPlayer.play().then(() => {
           playButton.style.display = 'none';
           pauseButton.style.display = 'block';
@@ -553,23 +591,9 @@
         };
       }
 
-      // Удаляем взрыв после 1 секунды
       setTimeout(() => {
         bioContainer.removeChild(explosionImg);
       }, 1000);
-    }
-
-    function rotateBio(event) {
-      const bioContainer = document.querySelector('.bio-container');
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      const mouseX = event.clientX - centerX;
-      const mouseY = event.clientY - centerY;
-
-      const rotateY = (mouseX / window.innerWidth) * 10;
-      const rotateX = -(mouseY / window.innerHeight) * 10;
-
-      bioContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     }
 
     document.addEventListener('mousemove', rotateBio);
@@ -582,9 +606,10 @@
         'https://media.tenor.com/OqqdRvSNld4AAAAi/blood-chainsaw.gif',
         'assets/vk.png',
         'assets/discord.png',
-        'https://i1.sndcdn.com/artworks-000629614825-i72m9v-original.jpg',
+        'https://i1.sndcdn.com/artworks-WaBbg3yEEpt5KTyY-yDc1yw-t200x200.jpg',
         'assets/pesnia.mp3',
-        'https://theblueprint.ru/upload/5242/8cc7d113c70f5a3a1feedaed1eb60c14.gif'
+        'https://theblueprint.ru/upload/5242/8cc7d113c70f5a3a1feedaed1eb60c14.gif',
+        'assets/rama.png'
       ];
 
       let loadedResources = 0;
@@ -616,10 +641,9 @@
       function initializeSite() {
         animateTitle();
 
-        // Инициализация счётчика OSINT
         const osintStartDate = new Date('2024-11-10T00:00:00Z');
         function updateOsintDays() {
-          const now = new Date('2025-05-09T23:46:00Z');
+          const now = new Date('2025-05-23T16:37:00Z');
           const diffTime = Math.abs(now - osintStartDate);
           const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
           document.getElementById('osintDays').textContent = diffDays;
@@ -667,7 +691,6 @@
           }
         });
 
-        // Пауза при начале перемотки
         progress.addEventListener('mousedown', () => {
           if (!audioPlayer.paused) {
             audioPlayer.pause();
@@ -676,7 +699,6 @@
           }
         });
 
-        // Воспроизведение после завершения перемотки
         progress.addEventListener('mouseup', () => {
           audioPlayer.play().then(() => {
             playButton.style.display = 'none';
